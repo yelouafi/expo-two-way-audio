@@ -17,8 +17,8 @@ A Speechmatics API key is also needed in order to run the example. The key is in
 ```
 EXPO_PUBLIC_SPEECHMATICS_API_KEY='YOUR-API-KEY-HERE'
 ```
-An API key can be obtained from the [Speechmatics Portal](https://portal.speechmatics.com)
 
+An API key can be obtained from the [Speechmatics Portal](https://portal.speechmatics.com)
 
 > [!WARNING]
 >
@@ -26,24 +26,25 @@ An API key can be obtained from the [Speechmatics Portal](https://portal.speechm
 > In a real-world scenario, you should not expose your API key in your client-side code.
 > Instead, you should create a server-side endpoint that generates the temporary token (JWT) for you.
 
-
 ## Run the app
 
 In the `examples/flow-api` directory:
 
 1. Install dependencies:
-    ```sh
-    npm install
-    ```
+
+   ```sh
+   npm install
+   ```
 
 2. Run the app:
-    ```sh
-    # Run iOS
-    npm run ios
 
-    # Run Android
-    npm run android
-    ```
+   ```sh
+   # Run iOS
+   npm run ios
+
+   # Run Android
+   npm run android
+   ```
 
 ## Notes
 

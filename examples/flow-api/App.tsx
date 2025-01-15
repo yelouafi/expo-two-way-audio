@@ -57,14 +57,22 @@ export function FlowTest() {
   const [audioInitialized, setAudioInitialized] = useState(false);
   const inputVolumeLevel = useSharedValue(0.0);
   const outputVolumeLevel = useSharedValue(0.0);
-  const micMode = Platform.OS === "ios" ? getMicrophoneModeIOS() : "NO_MIC_MODE_IN_ANDROID";
-
   const isRecording = useIsRecording();
-
   const { startConversation, endConversation, sendAudio } = useFlow();
 
-  // Handling Messages
+  // Initialize Expo Two Way Audio
+  useEffect(() => {
+    const initializeAudio = async () => {
+      await initialize();
+      setAudioInitialized(true);
+    };
+
+    initializeAudio();
+  }, []);
+
+  // Setup a handler for the "message" event from Flow API
   useFlowEventListener("message", ({ data }) => {
+    // For the purpose of this example, just print the content fo the transcript
     if (data.message === "AddTranscript") {
       for (const result of data.results as {
         alternatives: Array<RecognitionAlternative>;
@@ -76,55 +84,58 @@ export function FlowTest() {
     }
   });
 
-  // Handling audio
+  // Setup a handler for the "agentAudio" event from Flow API
   useFlowEventListener("agentAudio", (audio) => {
     // Even though Int16Array is a more natural representation for PCM16_sle,
-    // Expo requires us to pass a UintArray here, as only this JS type can be cast to the Swift "Data" type
-    // See implementation here: https://github.com/expo/expo/blob/4b75917d8456d8852bf95d17add90b464fa5fd62/packages/expo-modules-core/ios/Core/DynamicTypes/DynamicDataType.swift#L6
+    // Expo Modules API uses a convertible type for arrays of bytes and it needs Uint8Array in the JS side.
+    // This is converted to a `Data` type in Swift and to a `kotlin.ByteArray` in Kotlin.
+    // More info here: https://docs.expo.dev/modules/module-api/#convertibles
+    // For this reason, the Expo Two Way Audio library requires a Uint8Array argument for the `playPCMData` function.
     const byteArray = new Uint8Array(audio.data.buffer);
     playPCMData(byteArray);
   });
 
+  // Setup a handler for the "onMicrophoneData" event from Expo Two Way Audio module
   useExpoTwoWayAudioEventListener(
     "onMicrophoneData",
     useCallback<MicrophoneDataCallback>(
       (event) => {
+        // We send the audio bytes to the Flow API
         sendAudio(event.data.buffer);
       },
       [sendAudio],
     ),
   );
 
+  // Setup a handler for the "onInputVolumeLevelData" event from Expo Two Way Audio module.
+  // This event is triggered when the input volume level changes.
   useExpoTwoWayAudioEventListener(
     "onInputVolumeLevelData",
     useCallback<VolumeLevelCallback>(
       (event) => {
+        // We update the react-native-reanimated shared value for the input volume (microphone).
+        // This allow us to create animations for the microphone volume based on this shared value.
         inputVolumeLevel.value = event.data;
       },
       [inputVolumeLevel],
     ),
   );
 
+  // Setup a handler for the "onOutputVolumeLevelData" event from Expo Two Way Audio module.
+  // This event is triggered when the output volume level changes.
   useExpoTwoWayAudioEventListener(
     "onOutputVolumeLevelData",
     useCallback<VolumeLevelCallback>(
       (event) => {
+        // We update the react-native-reanimated shared value for the output volume (speaker).
+        // This allow us to create animations for the speaker volume based on this shared value.
         outputVolumeLevel.value = event.data;
       },
       [outputVolumeLevel],
     ),
   );
 
-  // Initialize audio engine and add microphone data listener
-  useEffect(() => {
-    const initializeAudio = async () => {
-      await initialize();
-      setAudioInitialized(true);
-    };
-
-    initializeAudio();
-  }, []);
-
+  // Handle clicks to the 'Connect/Disconnect' button
   const handleToggleConnect = useCallback(async () => {
     setIsConnectingToFlow(true);
     if (isConnectedToFlow) {
@@ -162,6 +173,7 @@ export function FlowTest() {
     setIsConnectingToFlow(false);
   }, [isConnectedToFlow, startConversation, endConversation]);
 
+  // Handle clicks to the 'Mute/Unmute' button
   const handleToggleMute = useCallback(() => {
     toggleRecording(!isRecording);
   }, [isRecording]);
