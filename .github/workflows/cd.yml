@@ -20,6 +20,9 @@ jobs:
           node-version: "${{ steps.node_version.outputs.NVMRC }}"
           cache: npm
 
+      - name: 📦 Install Dependencies
+        run: npm ci
+
       - name: ⬆️ Publish
         run: npm publish --access public
         env:
