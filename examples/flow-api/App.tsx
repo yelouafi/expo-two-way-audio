@@ -72,7 +72,7 @@ export function FlowTest() {
 
   // Setup a handler for the "message" event from Flow API
   useFlowEventListener("message", ({ data }) => {
-    // For the purpose of this example, just print the content fo the transcript
+    // For the purpose of this example, just print the content of the transcript
     if (data.message === "AddTranscript") {
       for (const result of data.results as {
         alternatives: Array<RecognitionAlternative>;
@@ -142,13 +142,20 @@ export function FlowTest() {
       endConversation();
       setIsConnectedToFlow(false);
     } else {
-      // WARNING: This function is used for the purpose of this example only.
-      // In a real-world scenario, you should not expose your API key in your client-side code.
-      // Instead, you should create a server-side endpoint that generates the JWT for you.
-      const jwt = await getFlowAPIJwt(
-        // EXPO_PUBLIC_SPEECHMATICS_API_KEY could be set in your .env file
-        process.env.EXPO_PUBLIC_SPEECHMATICS_API_KEY,
-      );
+      let jwt;
+      try {
+        // WARNING: This function is used for the purpose of this example only.
+        // In a real-world scenario, you should not expose your API key in your client-side code.
+        // Instead, you should create a server-side endpoint that generates the JWT for you.
+        jwt = await getFlowAPIJwt(
+          // EXPO_PUBLIC_SPEECHMATICS_API_KEY could be set in your .env file
+          process.env.EXPO_PUBLIC_SPEECHMATICS_API_KEY,
+        );
+      } catch (error) {
+        console.error("Failed to get JWT:", error);
+        setIsConnectingToFlow(false);
+        return;
+      }
 
       try {
         await startConversation(jwt, {

@@ -5,7 +5,7 @@ import { createSpeechmaticsJWT } from "@speechmatics/auth";
 // Instead, you should create a server-side endpoint that generates the JWT for you.
 export async function getFlowAPIJwt(apiKey: string) {
   if (!apiKey) {
-    throw new Error("API key is required");
+    throw new Error("API key is required.");
   }
   return await createSpeechmaticsJWT({
     type: "flow",
