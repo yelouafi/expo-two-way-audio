@@ -24,27 +24,30 @@ Please check out our [examples/](./examples) to get full sample code.
 
 1. Request permissions for recording audio
 
-    ```JSX
-    import {useMicrophonePermissions} from "@speechmatics/expo-two-way-audio";
+   ```JSX
+   import {useMicrophonePermissions} from "@speechmatics/expo-two-way-audio";
 
-    const [micPermission, requestMicPermission] = useMicrophonePermissions();
-    console.log(micPermission);
-    ```
+   const [micPermission, requestMicPermission] = useMicrophonePermissions();
+   console.log(micPermission);
+   ```
+
 1. Initialize the module before calling any audio functionality.
-    ```JSX
-    useEffect(() => {
-        const initializeAudio = async () => {
-            await initialize();
-        };
-        initializeAudio();
-    }, []);
 
-    ```
+   ```JSX
+   useEffect(() => {
+       const initializeAudio = async () => {
+           await initialize();
+       };
+       initializeAudio();
+   }, []);
+
+   ```
+
 1. Play audio
 
-    > [!NOTE]
-    > The sample below uses the `buffer` module:
-    > `npm install buffer`
+   > [!NOTE]
+   > The sample below uses the `buffer` module:
+   > `npm install buffer`
 
    ```JSX
     import { Buffer } from "buffer";
@@ -57,21 +60,21 @@ Please check out our [examples/](./examples) to get full sample code.
     playPCMData(pcmData);
    ```
 
-2. Get microphone samples
+1. Get microphone samples
 
-    ```JSX
-    // Set up a function to deal with microphone sample events.
-    // In this case just print the data in the console.
-    useExpoTwoWayAudioEventListener(
-        "onMicrophoneData",
-        useCallback<MicrophoneDataCallback>((event) => {
-            console.log(`MIC DATA: ${event.data}`);
-        }, []),
-    );
+   ```JSX
+   // Set up a function to deal with microphone sample events.
+   // In this case just print the data in the console.
+   useExpoTwoWayAudioEventListener(
+       "onMicrophoneData",
+       useCallback<MicrophoneDataCallback>((event) => {
+           console.log(`MIC DATA: ${event.data}`);
+       }, []),
+   );
 
-    // Unmute the microphone to get microphone data events
-    toggleRecording(true);
-    ```
+   // Unmute the microphone to get microphone data events
+   toggleRecording(true);
+   ```
 
 ## Notes
 
