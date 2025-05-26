@@ -136,13 +136,13 @@ class AudioEngine {
             // We don't do any input processing (no volume calculation or passing mic data to the callback) if discardRecording == true
             // See comment in the playPCMData function
 
+            self?.updateInputVolume()
+
             if self?.isRecording == true && self?.discardRecording == false {
                 if let convertedBuffer = Self.downsample(
                     buffer: buffer, converter: converter, downsampledFormat: outputFormat)
                 {
-
                     self?.processMicrophoneBuffer(convertedBuffer)
-                    self?.updateInputVolume()
                 } else {
                     print("Error: Could not downsample buffer")
                 }
